@@ -29,6 +29,6 @@ export default class MineLocation extends HistoryLocation {
   }
 }
 
-function buildLocalePrefixRegexp(locale) {
+export function buildLocalePrefixRegexp(locale) {
   return new RegExp(`^\/${locale}\/`);
 }
