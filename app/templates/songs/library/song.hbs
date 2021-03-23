@@ -1,0 +1,5 @@
+<h3>Song {{@model.songId}}</h3>
+
+<LinkTo @route="songs.library.song.reviews" @model={{@model.songId}}>Reviews</LinkTo>
+
+{{outlet}}
