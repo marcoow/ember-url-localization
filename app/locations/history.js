@@ -10,7 +10,7 @@ export default class MineLocation extends HistoryLocation {
     return path;
   }
 
-  formatURL(path) {
+  formatURL() {
     let url = super.formatURL(...arguments);
     let localePrefix = buildLocalePrefixRegexp(this.intl.primaryLocale);
     if (!url.match(localePrefix)) {
