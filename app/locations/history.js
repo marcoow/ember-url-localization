@@ -7,11 +7,13 @@ export default class MineLocation extends HistoryLocation {
   getURL() {
     let path = super.getURL(...arguments);
     path = this._stripLocalePrefix(path);
+    // TODO: reverse-translate url from this.intl.currentLocale
     return path;
   }
 
   formatURL() {
     let url = super.formatURL(...arguments);
+    // TODO: translate url to this.intl.currentLocale
     let localePrefix = buildLocalePrefixRegexp(this.intl.primaryLocale);
     if (!url.match(localePrefix)) {
       let urlSuffix = url.startsWith("/") ? url : `/${url}`;
