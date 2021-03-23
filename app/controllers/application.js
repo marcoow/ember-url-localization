@@ -4,6 +4,7 @@ import { action } from '@ember/object';
 
 export default class ApplicationController extends Controller {
   @service intl;
+  @service router;
 
   get isEnUs() {
     return this.intl.primaryLocale === "en-us";
@@ -18,5 +19,6 @@ export default class ApplicationController extends Controller {
     let { value: locale } = event.target;
     this.intl.locale = locale;
     localStorage.setItem("locale", locale);
+    window.location.reload(this.router.currentURL);
   }
 }
