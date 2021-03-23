@@ -11,12 +11,13 @@ export default class MineLocation extends HistoryLocation {
   }
 
   formatURL(path) {
-    let superResult = super.formatURL(...arguments);
-    if (!superResult.startsWith(`/${this.intl.primaryLocale}/`)) {
-      let routeSuffix = superResult.startsWith("/") ? superResult : `/${superResult}`;
-      superResult = `/${this.intl.primaryLocale}${routeSuffix}`;
+    let url = super.formatURL(...arguments);
+    let localePrefix = buildLocalePrefixRegexp(this.intl.primaryLocale);
+    if (!url.match(localePrefix)) {
+      let urlSuffix = url.startsWith("/") ? url : `/${url}`;
+      url = `/${this.intl.primaryLocale}${urlSuffix}`;
     }
-    return superResult;
+    return url;
   }
 
   _stripLocalePrefix(path) {
