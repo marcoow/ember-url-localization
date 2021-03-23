@@ -1,5 +1,12 @@
+<h1>{{t "app"}}</h1>
+
 <LinkTo @route="index">Home</LinkTo>
 <LinkTo @route="songs">Songs</LinkTo>
 <LinkTo @route="songs.library">Library</LinkTo>
 
 {{outlet}}
+
+<select {{on "change" this.setLocale}}>
+  <option value="en-us" selected={{this.isEnUs}}>en</option>
+  <option value="es-es" selected={{this.isEsEs}}>es</option>
+</select>
