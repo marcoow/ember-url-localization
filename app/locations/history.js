@@ -1,5 +1,5 @@
-import HistoryLocation from '@ember/routing/history-location';
-import { inject as service } from '@ember/service';
+import HistoryLocation from "@ember/routing/history-location";
+import { inject as service } from "@ember/service";
 
 export default class MineLocation extends HistoryLocation {
   @service intl;
@@ -7,6 +7,8 @@ export default class MineLocation extends HistoryLocation {
   getURL() {
     let path = super.getURL(...arguments);
     path = this._stripLocalePrefix(path);
+    let internalPath = mapLocalisedToInternalURL(path, this.intl.currentLocale);
+    debugger;
     // TODO: reverse-translate url from this.intl.currentLocale
     return path;
   }
@@ -33,4 +35,34 @@ export default class MineLocation extends HistoryLocation {
 
 export function buildLocalePrefixRegexp(locale) {
   return new RegExp(`^\/${locale}\/`);
+}
+
+const translations = {
+  en: {
+    about: 0,
+    teachers: 1,
+    songs: 2,
+  },
+  es: {
+    "acerca-de": 0,
+    profesores: 1,
+    canciones: 2,
+  },
+};
+
+const internalURLValues = {
+  0: "about",
+  1: "teachers",
+  2: "songs",
+};
+
+export function mapLocalisedToInternalURL(url, selectedLocale = "es") {
+  let urlSegements = url.split("/");
+  let activeTranslations = translations[selectedLocale];
+  return urlSegements.map((urlSegment) => {
+    if (activeTranslations.hasOwnProperty(urlSegment)) {
+      return internalURLValues[activeTranslations[urlSegment]];
+    }
+    return urlSegment;
+  });
 }
