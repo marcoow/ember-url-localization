@@ -12,6 +12,7 @@ Router.map(function() {
       this.route("song", { path: "/:songId" }, function() {
         this.route("reviews");
       });
+      this.route("about");
     });
   })
 });
