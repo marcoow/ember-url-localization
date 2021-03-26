@@ -21,10 +21,12 @@ export default class MineLocation extends HistoryLocation {
   @service intl;
 
   getURL() {
-    let path = super.getURL(...arguments);
-    path = this._stripLocalePrefix(path);
-    // TODO: reverse-translate url from this.intl.currentLocale
-    return path;
+    let url = super.getURL(...arguments);
+    let [bareUrl, matchedLocale] = this._stripLocalePrefix(url);
+    if (matchedLocale !== DEFAULT_LOCALE) {
+      bareUrl = this._reverseTranslateUrl(bareUrl, matchedLocale);
+    }
+    return bareUrl;
   }
 
   formatURL() {
@@ -40,12 +42,17 @@ export default class MineLocation extends HistoryLocation {
     return url;
   }
 
-  _stripLocalePrefix(path) {
+  _stripLocalePrefix(url) {
+    let matchedLocale;
     for (let locale of this.intl.locales) {
       let prefix = buildLocalePrefixRegexp(locale);
-      path = path.replace(prefix, "");
+      if (url.match(prefix)) {
+        url = url.replace(prefix, "");
+        matchedLocale = locale;
+        break;
+      }
     }
-    return path;
+    return [url, matchedLocale];
   }
 
   _translateUrl(url) {
@@ -64,6 +71,23 @@ export default class MineLocation extends HistoryLocation {
     }, []);
     return translatedPaths.join("/")
   }
+
+  _reverseTranslateUrl(url, locale) {
+    let translations = TRANSLATIONS[locale];
+    let paths = url.split("/").filter((path) => path.length > 0);
+    let translatedPaths = paths.reduce((acc, path) => {
+      let translationData = getReverseTranslationData(path, translations);
+
+      if (translationData.isDynamicSegment) {
+        acc.push(path);
+      } else {
+        acc.push(translationData.originalPath);
+      }
+      translations = translationData.children;
+      return acc;
+    }, []);
+    return translatedPaths.join("/");
+  }
 }
 
 function getTranslationData(path, translations) {
@@ -80,6 +104,23 @@ function getTranslationData(path, translations) {
       children: data[0],
     };
   }
+}
+
+function getReverseTranslationData(path, translations) {
+  let key = Object.keys(translations).find((key) => translations[key][0] === path) || DYNAMIC_SEGMENT;
+  let children;
+  let translationData = {};
+  if (key === DYNAMIC_SEGMENT) {
+    children = translations[key][0];
+    translationData.isDynamicSegment = true;
+  } else {
+    children = translations[key][1];
+    translationData.originalPath = key;
+  }
+  return {
+    ...translationData,
+    children,
+  };
 }
 
 export function buildLocalePrefixRegexp(locale) {
